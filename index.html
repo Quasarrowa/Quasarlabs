@@ -1,124 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Quasar Labs 🧪🔬</title>
-
-  <!-- Styles + Chart.js + Howler (for sound) -->
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quasar Labs 🧪</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="wrap">
-    <header class="header">
-      <div class="brand">🔬 <span>Quasar Labs</span> 🧪</div>
-      <div class="subtitle">Immersive dApp testing lab — paste a NEAR contract and run diagnostics</div>
+  <div class="lab-container">
+    <header>
+      <h1>⚡ Quasar Labs ⚡</h1>
+      <p>Where dApps get tested 🔬</p>
     </header>
 
-    <nav class="nav">
-      <button class="tab-btn active" onclick="openTab(event,'lab-tests')">🧪 Lab Tests</button>
-      <button class="tab-btn" onclick="openTab(event,'balance-checker')">💰 Balance Checker</button>
-      <button class="tab-btn" onclick="openTab(event,'extras')">⚙️ Extras</button>
+    <nav>
+      <button class="tab-btn active" onclick="openTab('lab')">🧪 Lab Tests</button>
+      <button class="tab-btn" onclick="openTab('balance')">💰 Balance Checker</button>
     </nav>
 
-    <!-- Sci-Fi background elements & test tube -->
-    <div id="sci-bg">
-      <div class="holo-grid"></div>
-      <div class="floating-icons" aria-hidden="true">
-        <div class="icon">🔬</div>
-        <div class="icon">🧪</div>
-        <div class="icon">🥼</div>
-      </div>
-
-      <div class="test-tube" aria-hidden="true">
-        <div class="liquid" id="liquid"></div>
-        <div class="tube-glow"></div>
-      </div>
-    </div>
-
-    <!-- TAB: LAB TESTS -->
-    <main id="lab-tests" class="tab-content active">
-      <section class="panel">
-        <h2>🔬 Contract Microscope</h2>
-        <label>NEAR Testnet Contract Address</label>
-        <input id="contract" type="text" placeholder="e.g., guest-book.testnet">
-        <div class="btn-row">
-          <button onclick="fetchContractFromUI()">🔎 Quick Scan</button>
-          <button onclick="runFullDiagnostic()">🧪 Run Full Diagnostic</button>
-        </div>
-        <div id="result" class="output">Waiting for input...</div>
+    <main>
+      <!-- Lab Tests -->
+      <section id="lab" class="tab-content active">
+        <h2>Contract Scanner 🔬</h2>
+        <input type="text" id="contractId" placeholder="Enter contract ID (e.g. guest-book.testnet)" />
+        <button onclick="runLabTests()">Run Tests</button>
+        <ul id="test-results"></ul>
       </section>
 
-      <section class="panel">
-        <h2>🧬 Method Analyzer</h2>
-        <label>Method name (view-only)</label>
-        <input id="method" type="text" placeholder="e.g., getMessages">
-        <label>Arguments (JSON)</label>
-        <textarea id="args" rows="3" placeholder='e.g., {"from_index":0}'></textarea>
-        <div class="btn-row">
-          <button onclick="callMethod()">▶️ Run Method</button>
-        </div>
-        <div id="methodResult" class="output">Awaiting method test...</div>
-      </section>
-
-      <section class="panel">
-        <h2>🧪 Experiments</h2>
-        <div class="btn-row">
-          <button onclick="runPreset('guest-book.testnet')">📖 guest-book.testnet</button>
-          <button onclick="runPreset('wrap.testnet')">💎 wrap.testnet</button>
-          <button onclick="runPreset('staking_pool.testnet')">⛓️ staking_pool.testnet</button>
-        </div>
-        <div id="experiments" class="output">Choose an experiment above.</div>
-      </section>
-
-      <section class="panel">
-        <h2>🥽 Analytics Goggles</h2>
-        <div id="analytics" class="output">No contract tested yet.</div>
-        <canvas id="balanceChart" width="600" height="200"></canvas>
+      <!-- Balance Checker -->
+      <section id="balance" class="tab-content">
+        <h2>Balance Analyzer 💰</h2>
+        <input type="text" id="accountId" placeholder="Enter account ID" />
+        <button onclick="checkBalance()">Check Balance</button>
+        <p id="balance-result"></p>
       </section>
     </main>
-
-    <!-- TAB: BALANCE CHECKER -->
-    <main id="balance-checker" class="tab-content">
-      <section class="panel">
-        <h2>💰 NEAR Balance Checker</h2>
-        <label>Enter NEAR testnet account</label>
-        <input id="accountId" type="text" placeholder="example.testnet">
-        <div class="btn-row"><button onclick="checkBalance()">Check Balance</button></div>
-        <div id="balance-result" class="output">No result yet.</div>
-      </section>
-    </main>
-
-    <!-- TAB: EXTRAS -->
-    <main id="extras" class="tab-content">
-      <section class="panel">
-        <h2>⚙️ Extras</h2>
-        <p>Sound and visuals controls.</p>
-        <div class="btn-row">
-          <button onclick="toggleSound()">🔊 Toggle Sound</button>
-          <button onclick="clearHistory()">🧹 Clear History</button>
-          <button onclick="downloadReport()">⬇️ Download Last Report</button>
-        </div>
-        <div id="live-rpc" class="output">RPC: <span id="rpcInfo">not checked</span></div>
-      </section>
-    </main>
-
-    <footer class="footer">🥼 Built at Quasar Labs | Powered by NEAR + Lava RPC</footer>
   </div>
-
-  <!-- Sounds (Howler will manage playback) -->
-  <script>
-    // small preload so mobile will allow sound after first gesture
-    const sounds = {
-      scan: new Howl({ src: ['https://actions.google.com/sounds/v1/alarms/beep_short.ogg'] }),
-      bubble: new Howl({ src: ['https://actions.google.com/sounds/v1/water/bubbles.ogg'] }),
-      click: new Howl({ src: ['https://actions.google.com/sounds/v1/ui/button_click.ogg'] })
-    };
-    let soundEnabled = true;
-    function toggleSound(){ soundEnabled = !soundEnabled; document.getElementById('rpcInfo').textContent = soundEnabled ? 'sound on' : 'sound off'; }
-  </script>
 
   <script src="script.js"></script>
 </body>
