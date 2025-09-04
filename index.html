@@ -74,3 +74,40 @@
 </script>
 <button onclick="checkNearBalance()">🔎 Check NEAR Balance</button>
 <p id="near-balance"></p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quasar Labs</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="navbar">
+    <h1>⚡ Quasar Labs ⚡</h1>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="openTab('lab-tests')">🧪 Lab Tests</button>
+      <button class="tab-btn" onclick="openTab('balance-checker')">💰 Balance Checker</button>
+    </div>
+  </div>
+
+  <!-- Lab Tests Section -->
+  <div id="lab-tests" class="tab-content active">
+    <h2>🧪 DApp Testing Lab</h2>
+    <p>Run tests on your dApp and get ✅ working steps and ❌ errors listed clearly.</p>
+    <button onclick="runLabTests()">Run Tests</button>
+    <ul id="test-results"></ul>
+  </div>
+
+  <!-- Balance Checker Section -->
+  <div id="balance-checker" class="tab-content">
+    <h2>💰 NEAR Balance Checker</h2>
+    <p>Enter a NEAR account to check its balance.</p>
+    <input type="text" id="accountId" placeholder="example.testnet">
+    <button onclick="checkBalance()">Check Balance</button>
+    <p id="balance-result"></p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
