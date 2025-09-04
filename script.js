@@ -94,3 +94,27 @@ function animateTube() {
   liquid.style.height = "0%";
   liquid.style.animation = "fill 3s forwards";
 }
+async function checkNearBalance() {
+  const acct = "YOURACCOUNT.testnet"; // Replace with your account
+  const resp = await fetch("https://g.w.lavanet.xyz:443/gateway/near/rpc-http/a6e5f4c9ab534914cbf08b66860da55d", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: "dontcare",
+      method: "query",
+      params: {
+        request_type: "view_account",
+        finality: "final",
+        account_id: acct
+      }
+    })
+  });
+  const data = await resp.json();
+  if (data.result && data.result.amount) {
+    const NEAR = (data.result.amount / 1e24).toFixed(4);
+    document.getElementById("near-balance").innerText = `${acct} Balance: ${NEAR} NEAR`;
+  } else {
+    document.getElementById("near-balance").innerText = `Error fetching data for ${acct}`;
+  }
+}
