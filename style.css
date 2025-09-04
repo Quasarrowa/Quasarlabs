@@ -148,3 +148,40 @@ footer {
   font-size: 0.9em;
   color: #888;
 }
+/* Futuristic glowing sci-fi lab background */
+body {
+  background: radial-gradient(circle at center, #0a0f29, #000000);
+  color: #00f9ff;
+  font-family: 'Orbitron', sans-serif;
+  overflow: hidden;
+}
+
+/* Floating particles */
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #00f9ff;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: float 8s infinite ease-in-out;
+}
+
+@keyframes float {
+  0%   { transform: translateY(0) translateX(0); opacity: 1; }
+  50%  { transform: translateY(-200px) translateX(100px); opacity: 0.5; }
+  100% { transform: translateY(0) translateX(0); opacity: 1; }
+}
+
+/* Neon lab frame */
+.lab-frame {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  border: 2px solid #00f9ff;
+  border-radius: 12px;
+  box-shadow: 0 0 25px #00f9ff, 0 0 50px #0088ff inset;
+  pointer-events: none;
+}
