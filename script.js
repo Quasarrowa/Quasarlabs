@@ -118,3 +118,40 @@ async function checkNearBalance() {
     document.getElementById("near-balance").innerText = `Error fetching data for ${acct}`;
   }
 }
+async function checkBalance() {
+  const acct = document.getElementById("accountInput").value;
+  const resultBox = document.getElementById("result");
+
+  if (!acct) {
+    resultBox.innerText = "⚠️ Please enter an account.";
+    return;
+  }
+
+  try {
+    const response = await fetch("https://g.w.lavanet.xyz:443/gateway/near/rpc-http/a6e5f4c9ab534914cbf08b66860da55d", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: "dontcare",
+        method: "query",
+        params: {
+          request_type: "view_account",
+          account_id: acct,
+          finality: "final"
+        }
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.result) {
+      let balance = parseFloat(data.result.amount) / 1e24; // convert yoctoNEAR → NEAR
+      resultBox.innerText = `✅ ${acct} balance: ${balance.toFixed(5)} NEAR`;
+    } else {
+      resultBox.innerText = `❌ Error: ${JSON.stringify(data)}`;
+    }
+  } catch (err) {
+    resultBox.innerText = `❌ Failed: ${err.message}`;
+  }
+}
