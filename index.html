@@ -1,112 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Quasar Labs 🧪🔬</title>
+
+  <!-- styles + Chart.js -->
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <header>
-    <h1>🔬 Quasar Labs 🧪</h1>
-    <p>Where dApps get tested like real experiments 🥼🥽</p>
+  <header class="header">
+    <div class="brand">🔬 Quasar Labs 🧪</div>
+    <div class="subtitle">Where dApps get tested like real experiments</div>
   </header>
 
-  <!-- Test Tube -->
-  <div class="test-tube">
-    <div class="liquid" id="liquid"></div>
-    <div class="bubbles">
-      <div class="bubble"></div>
-      <div class="bubble"></div>
-      <div class="bubble"></div>
-    </div>
-  </div>
+  <nav class="nav">
+    <button class="tab-btn active" onclick="openTab(event,'lab-tests')">🧪 Lab Tests</button>
+    <button class="tab-btn" onclick="openTab(event,'balance-checker')">💰 Balance Checker</button>
+    <button class="tab-btn" onclick="openTab(event,'extras')">⚙️ Extras</button>
+  </nav>
 
-  <!-- Contract Checker -->
-  <div class="lab-container">
-    <h2>🔬 Contract Microscope</h2>
-    <label for="contract">Enter NEAR Testnet Contract Address:</label>
-    <input id="contract" type="text" placeholder="e.g., guest-book.testnet">
-    <button onclick="checkContract()">Run Test</button>
-    <div id="result">Waiting for input...</div>
-  </div>
+  <!-- LAB TESTS TAB -->
+  <main id="lab-tests" class="tab-content active">
+    <section class="panel">
+      <h2>🔬 Contract Microscope</h2>
+      <label>NEAR Testnet Contract Address</label>
+      <input id="contract" type="text" placeholder="e.g., guest-book.testnet">
+      <div class="btn-row">
+        <button onclick="fetchContractFromUI()">Run Test</button>
+        <button onclick="runFullDiagnostic()">🧪 Run Full Diagnostic</button>
+      </div>
+      <div id="result" class="output">Waiting for input...</div>
+    </section>
 
-  <!-- Analytics -->
-  <div class="lab-container">
-    <h2>🥽 Analytics Goggles</h2>
-    <div id="analytics">No contract tested yet.</div>
-    <canvas id="balanceChart" width="400" height="200"></canvas>
-  </div>
+    <section class="panel">
+      <h2>🧬 Method Analyzer</h2>
+      <label>Method name (view-only)</label>
+      <input id="method" type="text" placeholder="e.g., getMessages">
+      <label>Arguments (JSON)</label>
+      <textarea id="args" rows="3" placeholder='e.g., {"from_index":0}'></textarea>
+      <div class="btn-row">
+        <button onclick="callMethod()">Run Method</button>
+      </div>
+      <div id="methodResult" class="output">Awaiting method test...</div>
+    </section>
 
-  <!-- Experiments -->
-  <div class="lab-container">
-    <h2>🧪 Lab Experiments</h2>
-    <p>Quick tests on sample dApps:</p>
-    <button onclick="runPreset('guest-book.testnet')">📖 Guest Book</button>
-    <button onclick="runPreset('wrap.testnet')">💎 wNEAR</button>
-    <button onclick="runPreset('staking_pool.testnet')">⛓️ Staking Pool</button>
-    <div id="experiments">Choose an experiment above.</div>
-  </div>
+    <section class="panel">
+      <h2>🧪 Experiments</h2>
+      <div class="btn-row">
+        <button onclick="runPreset('guest-book.testnet')">📖 guest-book.testnet</button>
+        <button onclick="runPreset('wrap.testnet')">💎 wrap.testnet</button>
+        <button onclick="runPreset('staking_pool.testnet')">⛓️ staking_pool.testnet</button>
+      </div>
+      <div id="experiments" class="output">Choose an experiment above.</div>
+    </section>
 
-  <footer>
-    🥼 Built at Quasar Labs | Powered by NEAR + Lava RPC
-  </footer>
+    <section class="panel">
+      <h2>🥽 Analytics</h2>
+      <div id="analytics" class="output">No contract tested yet.</div>
+      <canvas id="balanceChart" width="600" height="200"></canvas>
+    </section>
+  </main>
 
-  <!-- Sound Effects -->
+  <!-- BALANCE CHECKER TAB -->
+  <main id="balance-checker" class="tab-content">
+    <section class="panel">
+      <h2>💰 NEAR Balance Checker</h2>
+      <label>Enter NEAR testnet account</label>
+      <input id="accountId" type="text" placeholder="example.testnet">
+      <div class="btn-row"><button onclick="checkBalance()">Check Balance</button></div>
+      <div id="balance-result" class="output">No result yet.</div>
+    </section>
+  </main>
+
+  <!-- EXTRAS TAB -->
+  <main id="extras" class="tab-content">
+    <section class="panel">
+      <h2>✨ Extras</h2>
+      <p>Neon lab visuals and sound are enabled. Use presets in Lab Tests to explore.</p>
+      <div class="panel">
+        <h3>Live Lava RPC</h3>
+        <div id="live-rpc" class="output">RPC: <span id="rpcInfo">not checked</span></div>
+        <div class="btn-row"><button onclick="checkRPC()">Check RPC</button></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">🥼 Built at Quasar Labs | Powered by NEAR + Lava RPC</footer>
+
+  <!-- Sound effects -->
   <audio id="scanner" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
   <audio id="bubbles" src="https://actions.google.com/sounds/v1/water/bubbles.ogg"></audio>
-
-  <script src="script.js"></script>
-</body>
-</html>
-<div class="lab-frame"></div>
-
-<!-- Neon floating particles -->
-<script>
-  for (let i = 0; i < 30; i++) {
-    let p = document.createElement("div");
-    p.className = "particle";
-    p.style.top = Math.random() * window.innerHeight + "px";
-    p.style.left = Math.random() * window.innerWidth + "px";
-    p.style.animationDuration = (5 + Math.random() * 10) + "s";
-    document.body.appendChild(p);
-  }
-</script>
-<button onclick="checkNearBalance()">🔎 Check NEAR Balance</button>
-<p id="near-balance"></p>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quasar Labs</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="navbar">
-    <h1>⚡ Quasar Labs ⚡</h1>
-    <div class="tabs">
-      <button class="tab-btn active" onclick="openTab('lab-tests')">🧪 Lab Tests</button>
-      <button class="tab-btn" onclick="openTab('balance-checker')">💰 Balance Checker</button>
-    </div>
-  </div>
-
-  <!-- Lab Tests Section -->
-  <div id="lab-tests" class="tab-content active">
-    <h2>🧪 DApp Testing Lab</h2>
-    <p>Run tests on your dApp and get ✅ working steps and ❌ errors listed clearly.</p>
-    <button onclick="runLabTests()">Run Tests</button>
-    <ul id="test-results"></ul>
-  </div>
-
-  <!-- Balance Checker Section -->
-  <div id="balance-checker" class="tab-content">
-    <h2>💰 NEAR Balance Checker</h2>
-    <p>Enter a NEAR account to check its balance.</p>
-    <input type="text" id="accountId" placeholder="example.testnet">
-    <button onclick="checkBalance()">Check Balance</button>
-    <p id="balance-result"></p>
-  </div>
 
   <script src="script.js"></script>
 </body>
