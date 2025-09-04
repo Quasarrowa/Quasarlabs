@@ -59,3 +59,16 @@
   <script src="script.js"></script>
 </body>
 </html>
+<div class="lab-frame"></div>
+
+<!-- Neon floating particles -->
+<script>
+  for (let i = 0; i < 30; i++) {
+    let p = document.createElement("div");
+    p.className = "particle";
+    p.style.top = Math.random() * window.innerHeight + "px";
+    p.style.left = Math.random() * window.innerWidth + "px";
+    p.style.animationDuration = (5 + Math.random() * 10) + "s";
+    document.body.appendChild(p);
+  }
+</script>
