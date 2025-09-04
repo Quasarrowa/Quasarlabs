@@ -1,120 +1,60 @@
-const LAVA_RPC = "https://g.w.lavanet.xyz:443/gateway/neart/rpc-http/a6e5f4c9ab534914cbf08b66860da55d";
-
-const scannerSound = document.getElementById("scanner");
-const bubblesSound = document.getElementById("bubbles");
-const liquid = document.getElementById("liquid");
-
-// Chart setup
-const ctx = document.getElementById("balanceChart").getContext("2d");
-const balanceChart = new Chart(ctx, {
-  type: "line",
-  data: {
-    labels: [],
-    datasets: [{
-      label: "Balance (NEAR)",
-      data: [],
-      borderColor: "#00e6ff",
-      backgroundColor: "rgba(0,230,255,0.2)",
-      tension: 0.3
-    }]
-  },
-  options: {
-    responsive: true,
-    scales: {
-      x: { title: { display: true, text: "Experiment Run" } },
-      y: { title: { display: true, text: "Balance (NEAR)" } }
-    }
-  }
-});
-
-async function checkContract() {
-  const contract = document.getElementById("contract").value.trim();
-  if (!contract) {
-    document.getElementById("result").textContent = "❌ Please enter a contract name.";
-    return;
-  }
-  scannerSound.play();
-  animateTube();
-  await fetchContract(contract, "result", "analytics");
+/* Quasar Labs - neon sci-fi theme (simple + resilient) */
+:root{
+  --bg1:#071022;
+  --bg2:#0f2030;
+  --neon-a:#00e6ff;
+  --neon-b:#ff00ff;
+  --panel: rgba(255,255,255,0.06);
 }
 
-async function runPreset(contract) {
-  document.getElementById("experiments").textContent = `⏳ Testing ${contract}...`;
-  scannerSound.play();
-  animateTube();
-  await fetchContract(contract, "experiments", "analytics");
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Inter,Segoe UI,system-ui,Arial;
+  background: radial-gradient(circle at 20% 10%, #07122b 0%, #071022 20%, #071022 100%), linear-gradient(180deg,var(--bg1),var(--bg2));
+  color:#e6f7ff;
+  -webkit-font-smoothing:antialiased;
+  padding:18px;
 }
 
-async function fetchContract(contract, targetDivId, analyticsDivId) {
-  const targetDiv = document.getElementById(targetDivId);
-  const analyticsDiv = document.getElementById(analyticsDivId);
-  targetDiv.textContent = "⏳ Running experiment...";
+/* header */
+.header{ text-align:center; margin-bottom:14px }
+.brand{ font-size:28px; color:var(--neon-a); text-shadow:0 0 12px rgba(0,230,255,0.25) }
+.subtitle{ color:#bcd; margin-top:6px }
 
-  try {
-    const response = await fetch(LAVA_RPC, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: "dontcare",
-        method: "query",
-        params: {
-          request_type: "view_account",
-          finality: "final",
-          account_id: contract
-        }
-      })
-    });
-
-    const data = await response.json();
-    if (data.result) {
-      const balance = (data.result.amount / 1e24).toFixed(4);
-      const storage = data.result.storage_usage;
-      targetDiv.textContent =
-        `✅ ${contract} scanned!\nBalance: ${balance} NEAR\nStorage: ${storage} bytes\n🔬 Via Lava RPC`;
-
-      analyticsDiv.textContent =
-        `🥽 Analytics Report:\n- Contract: ${contract}\n- Balance: ${balance} NEAR\n- Storage: ${storage} bytes`;
-
-      // update chart
-      balanceChart.data.labels.push(contract);
-      balanceChart.data.datasets[0].data.push(balance);
-      balanceChart.update();
-
-      bubblesSound.play();
-    } else {
-      targetDiv.textContent = "⚠️ Could not fetch contract info.";
-    }
-  } catch (err) {
-    targetDiv.textContent = "❌ Error connecting to Lava RPC.";
-  }
+/* nav */
+.nav{ display:flex; gap:8px; justify-content:center; margin-bottom:18px }
+.tab-btn{
+  background:linear-gradient(90deg,var(--neon-a),var(--neon-b));
+  border:none; color:#041523; padding:8px 12px; border-radius:8px; cursor:pointer;
+  font-weight:700; box-shadow:0 6px 20px rgba(0,0,0,0.4);
 }
+.tab-btn.active{ outline:3px solid rgba(255,255,255,0.06); transform:translateY(-2px) }
 
-function animateTube() {
-  liquid.style.height = "0%";
-  liquid.style.animation = "fill 3s forwards";
-}
-async function checkNearBalance() {
-  const acct = "YOURACCOUNT.testnet"; // Replace with your account
-  const resp = await fetch("https://g.w.lavanet.xyz:443/gateway/near/rpc-http/a6e5f4c9ab534914cbf08b66860da55d", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      jsonrpc: "2.0",
-      id: "dontcare",
-      method: "query",
-      params: {
-        request_type: "view_account",
-        finality: "final",
-        account_id: acct
-      }
-    })
-  });
-  const data = await resp.json();
-  if (data.result && data.result.amount) {
-    const NEAR = (data.result.amount / 1e24).toFixed(4);
-    document.getElementById("near-balance").innerText = `${acct} Balance: ${NEAR} NEAR`;
-  } else {
-    document.getElementById("near-balance").innerText = `Error fetching data for ${acct}`;
-  }
+/* tabs */
+.tab-content{ display:none; max-width:900px; margin:0 auto }
+.tab-content.active{ display:block }
+
+/* panels */
+.panel{ background:var(--panel); border-radius:12px; padding:14px; margin-bottom:14px; box-shadow:0 6px 20px rgba(0,0,0,0.6); border:1px solid rgba(0,0,0,0.2)}
+.panel h2{ color:var(--neon-b); margin:0 0 10px 0 }
+label{ display:block; margin-bottom:8px; color:#cfeff7}
+input[type="text"], textarea{ width:100%; padding:10px; border-radius:8px; border:none; background:rgba(255,255,255,0.03); color:inherit; margin-bottom:8px; font-size:14px}
+.btn-row{display:flex; gap:8px; margin-bottom:8px}
+button{ cursor:pointer; }
+
+/* output boxes */
+.output{ background:rgba(0,0,0,0.25); padding:10px; border-radius:8px; color:#dff; white-space:pre-wrap; font-size:13px }
+
+/* analytics canvas */
+canvas{ width:100%; max-width:100%; display:block; margin-top:10px; border-radius:6px; background:rgba(0,0,0,0.15); }
+
+/* footer */
+.footer{ text-align:center; margin-top:20px; color:#9fb; font-size:13px }
+
+/* responsive */
+@media (max-width:600px){
+  .nav{ flex-wrap:wrap }
+  .brand{ font-size:20px }
 }
