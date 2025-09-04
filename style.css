@@ -1,209 +1,103 @@
-// Quasar Labs - script.js (single-file diagnostic + tools)
-// IMPORTANT: uses your Lava NEAR RPC endpoint
-const LAVA_RPC = "https://g.w.lavanet.xyz:443/gateway/near/rpc-http/a6e5f4c9ab534914cbf08b66860da55d";
-
-// ---------- TAB SWITCH ----------
-function openTab(evt, tabId) {
-  // hide all tabs
-  document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
-  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-  // show chosen
-  document.getElementById(tabId).classList.add("active");
-  if (evt && evt.currentTarget) evt.currentTarget.classList.add("active");
+/* ==== Futuristic Lab Theme ==== */
+body {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  background: radial-gradient(circle at center, #0d0d1a, #000);
+  color: #00ffe0;
+  overflow-x: hidden;
+  min-height: 100vh;
 }
 
-// ---------- HELPERS ----------
-function safeAppend(containerId, text, ok=null) {
-  const el = document.getElementById(containerId);
-  const node = document.createElement("div");
-  if (ok === true) node.innerHTML = `✅ ${text}`;
-  else if (ok === false) node.innerHTML = `❌ ${text}`;
-  else node.textContent = text;
-  el.appendChild(node);
+/* Glowing particles */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url("https://i.ibb.co/6wL5pS5/particles.gif");
+  opacity: 0.15;
+  z-index: -1;
 }
 
-// generic RPC POST
-async function rpcPost(body) {
-  const resp = await fetch(LAVA_RPC, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  });
-  return resp.json();
+h1 {
+  text-align: center;
+  padding: 20px;
+  color: #00eaff;
+  text-shadow: 0 0 20px #00eaff;
 }
 
-// ---------- BALANCE CHECKER ----------
-async function checkBalance() {
-  const acct = (document.getElementById("accountId")||{}).value || "";
-  const out = document.getElementById("balance-result");
-  out.textContent = "⏳ Checking...";
-  if (!acct) { out.textContent = "⚠️ Enter an account id (e.g., guest-book.testnet)"; return; }
-
-  try {
-    const body = { jsonrpc:"2.0", id:"1", method:"query", params:{ request_type:"view_account", finality:"final", account_id:acct } };
-    const data = await rpcPost(body);
-    if (data && data.result) {
-      const near = parseFloat(data.result.amount)/1e24;
-      out.textContent = `✅ ${acct} balance: ${near.toFixed(5)} NEAR (storage: ${data.result.storage_usage})`;
-    } else {
-      out.textContent = `❌ Could not fetch account.`;
-    }
-  } catch(err) {
-    out.textContent = `❌ Error: ${err.message || err}`;
-  }
+.tabs {
+  text-align: center;
+  margin: 20px 0;
 }
 
-// ---------- CONTRACT MICROSCOPE (simple view_account + update chart) ----------
-async function fetchContractFromUI() {
-  const contract = (document.getElementById("contract")||{}).value.trim();
-  const target = document.getElementById("result");
-  const analytics = document.getElementById("analytics");
-  if (!contract) { target.textContent = "⚠️ Enter contract id."; return; }
-  target.textContent = "⏳ Running experiment...";
-  try {
-    const res = await rpcPost({ jsonrpc:"2.0", id:"q", method:"query", params:{ request_type:"view_account", finality:"final", account_id:contract } });
-    if (res && res.result) {
-      const bal = (parseFloat(res.result.amount)/1e24).toFixed(4);
-      target.textContent = `✅ ${contract} scanned!\nBalance: ${bal} NEAR\nStorage: ${res.result.storage_usage} bytes\n🔬 Via Lava RPC`;
-      analytics.textContent = `Last test: ${new Date().toLocaleString()}\nContract: ${contract}\nBalance: ${bal} NEAR`;
-
-      // update chart (simple)
-      try {
-        if (window.balanceChart) {
-          balanceChart.data.labels.push(contract);
-          balanceChart.data.datasets[0].data.push(parseFloat(bal));
-          balanceChart.update();
-        } else {
-          const ctx = document.getElementById("balanceChart").getContext("2d");
-          window.balanceChart = new Chart(ctx, {
-            type: "line",
-            data: { labels:[contract], datasets:[{ label:"Balance (NEAR)", data:[parseFloat(bal)], borderColor:"#00e6ff", backgroundColor:"rgba(0,230,255,0.15)"}] },
-            options:{responsive:true}
-          });
-        }
-      } catch(e){ /* chart fail silently */ }
-
-    } else {
-      target.textContent = "⚠️ Could not fetch contract info.";
-    }
-  } catch(err){ target.textContent = "❌ Error connecting to Lava RPC."; }
+.tab-btn {
+  background: transparent;
+  border: 2px solid #00ffe0;
+  color: #00ffe0;
+  padding: 10px 20px;
+  margin: 0 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-// ---------- METHOD CALL ----------
-async function callMethod() {
-  const contract = (document.getElementById("contract")||{}).value.trim();
-  const method = (document.getElementById("method")||{}).value.trim();
-  const argsText = (document.getElementById("args")||{}).value.trim();
-  const out = document.getElementById("methodResult");
-  out.textContent = "⏳ Running method (view)...";
-  if (!contract || !method) { out.textContent = "⚠️ Enter contract and method."; return; }
-
-  let args = {};
-  try { args = argsText ? JSON.parse(argsText) : {}; } catch(e){ out.textContent = "❌ Invalid JSON args."; return; }
-
-  try {
-    const body = { jsonrpc:"2.0", id:"1", method:"query", params:{ request_type:"call_function", finality:"final", account_id:contract, method_name:method, args_base64: btoa(JSON.stringify(args)) } };
-    const data = await rpcPost(body);
-    if (data && data.result && Array.isArray(data.result.result)) {
-      const text = new TextDecoder().decode(new Uint8Array(data.result.result));
-      try { out.textContent = `✅ Result:\n${JSON.stringify(JSON.parse(text), null, 2)}`; } catch { out.textContent = `✅ Result:\n${text}`; }
-    } else out.textContent = `❌ No result or RPC error: ${JSON.stringify(data.error||data)}`;
-  } catch(err){ out.textContent = `❌ Error: ${err.message||err}`; }
+.tab-btn:hover,
+.tab-btn.active {
+  background: #00ffe0;
+  color: #000;
+  box-shadow: 0 0 20px #00ffe0;
 }
 
-// ---------- EXPERIMENT PRESETS ----------
-function runPreset(contract) {
-  document.getElementById("experiments").textContent = `⏳ Testing ${contract}...`;
-  fetchContractFromUI_forPreset(contract);
-}
-async function fetchContractFromUI_forPreset(contract) {
-  try {
-    const res = await rpcPost({ jsonrpc:"2.0", id:"p", method:"query", params:{ request_type:"view_account", finality:"final", account_id:contract } });
-    const el = document.getElementById("experiments");
-    if (res && res.result) el.textContent = `✅ ${contract} scanned. Balance: ${(parseFloat(res.result.amount)/1e24).toFixed(4)} NEAR`;
-    else el.textContent = `⚠️ Could not fetch ${contract}`;
-  } catch(e){ document.getElementById("experiments").textContent = "❌ RPC error"; }
+.tab-content {
+  display: none;
+  text-align: center;
+  padding: 30px;
 }
 
-// ---------- SIMPLE LAB TEST SUITE ----------
-async function testRPCReachable() {
-  try {
-    const data = await rpcPost({ jsonrpc:"2.0", id:"status", method:"status", params:[] });
-    return (data && (data.version || data.chain_id || data.sync_info)) ? {ok:true,info:data.version || data.chain_id || "ok"} : {ok:false};
-  } catch(e){ return {ok:false,error:e.message||e}; }
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-async function testViewAccount(accountId) {
-  try {
-    const data = await rpcPost({ jsonrpc:"2.0", id:"view", method:"query", params:{ request_type:"view_account", finality:"final", account_id:accountId } });
-    if (data && data.result) return {ok:true,result:data.result};
-    return {ok:false,error:data.error||"no result"};
-  } catch(e){ return {ok:false,error:e.message||e}; }
+input {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #00ffe0;
+  background: #111;
+  color: #fff;
+  margin: 10px;
 }
 
-async function testViewCode(accountId) {
-  try {
-    const data = await rpcPost({ jsonrpc:"2.0", id:"code", method:"query", params:{ request_type:"view_code", finality:"final", account_id:accountId } });
-    if (data && data.result && data.result.code_base64) return {ok:true,size:data.result.code_base64.length};
-    return {ok:false,error:"no code"};
-  } catch(e){ return {ok:false,error:e.message||e}; }
+button {
+  padding: 10px 20px;
+  background: #00ffe0;
+  color: #000;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-async function testViewState(accountId) {
-  try {
-    const data = await rpcPost({ jsonrpc:"2.0", id:"state", method:"query", params:{ request_type:"view_state", finality:"final", account_id:accountId, prefix_base64:"" } });
-    if (data && data.result && Array.isArray(data.result.values)) return {ok:true,keys:data.result.values.length};
-    return {ok:false,error:"no state or blocked"};
-  } catch(e){ return {ok:false,error:e.message||e}; }
+button:hover {
+  background: #00b3a4;
+  box-shadow: 0 0 15px #00ffe0;
 }
 
-async function runFullDiagnostic() {
-  const contract = (document.getElementById("contract")||{}).value.trim();
-  const out = document.getElementById("result");
-  if (!contract) { out.textContent = "⚠️ Enter a contract address first."; return; }
-
-  out.innerHTML = "";
-  safeAppend("result", `Running full diagnostic on ${contract}...`);
-
-  // 1 RPC
-  safeAppend("result","• Checking RPC connectivity...");
-  const rpc = await testRPCReachable();
-  if (rpc.ok) safeAppend("result", `RPC reachable (${rpc.info||"ok"})`, true);
-  else safeAppend("result", `RPC unreachable (${rpc.error||"no response"})`, false);
-
-  // 2 view_account
-  safeAppend("result","• Checking account (view_account)...");
-  const acct = await testViewAccount(contract);
-  if (acct.ok) {
-    const bal = acct.result.amount ? (parseFloat(acct.result.amount)/1e24).toFixed(6) : "N/A";
-    safeAppend("result", `Account exists. Balance: ${bal} NEAR (storage: ${acct.result.storage_usage})`, true);
-  } else safeAppend("result", `Account check failed: ${acct.error}`, false);
-
-  // 3 view_code
-  safeAppend("result","• Checking contract code (view_code)...");
-  const code = await testViewCode(contract);
-  if (code.ok) safeAppend("result", `Contract code present (base64 size ${code.size})`, true);
-  else safeAppend("result", `No contract code: ${code.error}`, false);
-
-  // 4 view_state
-  safeAppend("result","• Inspecting contract storage (view_state)...");
-  const state = await testViewState(contract);
-  if (state.ok) safeAppend("result", `State keys accessible: ${state.keys}`, true);
-  else safeAppend("result", `State not accessible / empty: ${state.error}`, false);
-
-  // Summary
-  document.getElementById("analytics").textContent = `Last test: ${new Date().toLocaleString()}\nContract: ${contract}\nRPC: ${LAVA_RPC}`;
+ul {
+  list-style: none;
+  padding: 0;
 }
 
-// ---------- Extras ----------
-async function checkRPC() {
-  const span = document.getElementById("rpcInfo");
-  span.textContent = "checking...";
-  const r = await testRPCReachable();
-  span.textContent = r.ok ? `OK (${r.info||'v'})` : `Failed: ${r.error||'no response'}`;
+li {
+  margin: 10px 0;
+  padding: 10px;
+  background: rgba(0, 255, 224, 0.1);
+  border-left: 3px solid #00ffe0;
+  border-radius: 5px;
 }
 
-// Initialize default tab (in case)
-document.addEventListener("DOMContentLoaded", () => {
-  // nothing heavy needed
-});
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
