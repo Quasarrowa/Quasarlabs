@@ -94,3 +94,81 @@ function animateTube() {
   liquid.style.height = "0%";
   liquid.style.animation = "fill 3s forwards";
 }
+
+async function testContract() {
+    const contractAddress = document.getElementById('contractAddress').value || 'guest-book.testnet';
+    const testResult = document.getElementById('testResult');
+    const analyticsResult = document.getElementById('analyticsResult');
+    const experimentResults = document.getElementById('experimentResults');
+
+    testResult.innerHTML = 'Testing...';
+    analyticsResult.innerHTML = 'Analyzing...';
+    experimentResults.innerHTML = '';
+
+    const endpoint = 'https://g.w.lavanet.xyz:443/gateway/neart/rpc-http/a6e5f4c9ab534914cbf08b66860da55d';
+
+    try {
+        // Check contract deployment
+        const deployCheck = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                jsonrpc: '2.0',
+                id: 1,
+                method: 'query',
+                params: { request_type: 'view_code', finality: 'final', account_id: contractAddress }
+            })
+        });
+        const deployData = await deployCheck.json();
+
+        let results = [];
+        if (deployData.result && deployData.result.code_base64) {
+            results.push('✅ Contract Deployed: Code hash found.');
+            testResult.innerHTML = '✅ Contract Active';
+
+            // Try a basic view function (e.g., get_messages for guest-book.testnet)
+            const viewCheck = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    id: 2,
+                    method: 'query',
+                    params: {
+                        request_type: 'call_function',
+                        finality: 'final',
+                        account_id: contractAddress,
+                        method_name: 'get_messages',
+                        args_base64: btoa(JSON.stringify({}))
+                    }
+                })
+            });
+            const viewData = await viewCheck.json();
+
+            if (viewData.result && viewData.result.result) {
+                results.push('✅ Function Call (get_messages): Success.');
+            } else {
+                results.push('❌‼️⚠️ Function Call (get_messages): Failed or not supported.');
+                results.push('👀 Potential Issue: Function may be missing or restricted.');
+            }
+        } else {
+            testResult.innerHTML = '❌‼️⚠️ Contract Not Found';
+            results.push('❌‼️⚠️ Deployment Check: Contract not deployed or invalid address.');
+            results.push('👀 Potential Issue: Verify contract address.');
+        }
+
+        // Display results
+        analyticsResult.innerHTML = `Contract: ${contractAddress}`;
+        results.forEach(result => {
+            const li = document.createElement('li');
+            li.textContent = result;
+            experimentResults.appendChild(li);
+        });
+    } catch (error) {
+        testResult.innerHTML = '❌‼️⚠️ Test Failed';
+        analyticsResult.innerHTML = 'Error during analysis.';
+        const li = document.createElement('li');
+        li.textContent = `❌‼️⚠️ Error: ${error.message}. 👀 Potential network or endpoint issue.`;
+        experimentResults.appendChild(li);
+    }
+}
