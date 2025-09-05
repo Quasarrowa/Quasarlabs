@@ -16,23 +16,19 @@
       min-height: 100vh;
       padding: 20px;
     }
-
     header {
       text-align: center;
       margin-bottom: 30px;
     }
-
     header h1 {
       font-size: 3em;
       color: #00e6ff;
       text-shadow: 0px 0px 15px #00e6ff;
     }
-
     header p {
       font-size: 1.2em;
       color: #ddd;
     }
-
     .lab-container {
       background: rgba(0, 0, 0, 0.6);
       padding: 20px;
@@ -42,20 +38,17 @@
       width: 100%;
       box-shadow: 0px 0px 20px rgba(0, 230, 255, 0.5);
     }
-
     h2 {
       margin-bottom: 15px;
       font-size: 1.5em;
       color: #ff00ff;
       text-shadow: 0px 0px 10px #ff00ff;
     }
-
     label {
       display: block;
       margin-bottom: 10px;
     }
-
-    input {
+    input, textarea {
       width: 100%;
       padding: 12px;
       border-radius: 6px;
@@ -63,7 +56,6 @@
       margin-bottom: 20px;
       font-size: 1em;
     }
-
     button {
       background: linear-gradient(90deg, #00e6ff, #ff00ff);
       border: none;
@@ -75,12 +67,10 @@
       font-weight: bold;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-
     button:hover {
       transform: scale(1.05);
       box-shadow: 0px 0px 15px #ff00ff;
     }
-
     #result, #analytics, #experiments, #methodResult {
       margin-top: 15px;
       padding: 12px;
@@ -88,15 +78,12 @@
       background: rgba(255, 255, 255, 0.1);
       white-space: pre-wrap;
     }
-
     canvas {
       margin-top: 20px;
       background: rgba(0,0,0,0.3);
       border-radius: 10px;
       padding: 10px;
     }
-
-    /* Animated Test Tube */
     .test-tube {
       position: relative;
       width: 60px;
@@ -107,7 +94,6 @@
       overflow: hidden;
       box-shadow: 0 0 15px #00e6ff;
     }
-
     .liquid {
       position: absolute;
       bottom: 0;
@@ -116,7 +102,6 @@
       background: linear-gradient(180deg, #ff00ff, #00e6ff);
       animation: none;
     }
-
     .bubbles {
       position: absolute;
       bottom: 0;
@@ -124,7 +109,6 @@
       height: 100%;
       overflow: hidden;
     }
-
     .bubble {
       position: absolute;
       bottom: -20px;
@@ -135,21 +119,17 @@
       opacity: 0.7;
       animation: rise 4s infinite;
     }
-
     .bubble:nth-child(2) { left: 20px; animation-duration: 5s; animation-delay: 1s; }
     .bubble:nth-child(3) { left: 40px; animation-duration: 6s; animation-delay: 2s; }
-
     @keyframes rise {
       0% { transform: translateY(0); opacity: 0.7; }
       50% { opacity: 1; }
       100% { transform: translateY(-220px); opacity: 0; }
     }
-
     @keyframes fill {
       0% { height: 0%; }
       100% { height: 100%; }
     }
-
     footer {
       margin-top: 40px;
       font-size: 0.9em;
@@ -163,13 +143,10 @@
     <p>Where dApps get tested like real experiments 🥼🥽</p>
   </header>
 
-  <!-- Test Tube -->
   <div class="test-tube">
     <div class="liquid" id="liquid"></div>
     <div class="bubbles">
-      <div class="bubble"></div>
-      <div class="bubble"></div>
-      <div class="bubble"></div>
+      <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
     </div>
   </div>
 
@@ -189,17 +166,6 @@
     <canvas id="balanceChart" width="400" height="200"></canvas>
   </div>
 
-  <!-- Method Analyzer -->
-  <div class="lab-container">
-    <h2>🧬 Method Analyzer</h2>
-    <label for="method">Method Name:</label>
-    <input id="method" type="text" placeholder="e.g., getMessages">
-    <label for="args">Arguments (JSON):</label>
-    <input id="args" type="text" placeholder='e.g., {"from_index":0}'>
-    <button onclick="callMethod()">Run Method</button>
-    <div id="methodResult">Awaiting method test...</div>
-  </div>
-
   <!-- Experiments -->
   <div class="lab-container">
     <h2>🧪 Lab Experiments</h2>
@@ -210,158 +176,93 @@
     <div id="experiments">Choose an experiment above.</div>
   </div>
 
-  <footer>
-    🥼 Built at Quasar Labs | Powered by NEAR + Lava RPC
-  </footer>
+  <!-- Method Explorer -->
+  <div class="lab-container">
+    <h2>🧬 Method Explorer</h2>
+    <label for="method">Method Name:</label>
+    <input id="method" type="text" placeholder="e.g., getMessages">
+    
+    <label for="args">Arguments (JSON):</label>
+    <textarea id="args" rows="4" placeholder='e.g., {"from_index":0,"limit":5}'></textarea>
+    
+    <button onclick="callMethod()">Run Method</button>
+    <div id="methodResult">No method tested yet.</div>
+  </div>
 
-  <!-- Sound Effects -->
+  <footer>🥼 Built at Quasar Labs | Powered by NEAR + Lava RPC</footer>
+
   <audio id="scanner" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
   <audio id="bubbles" src="https://actions.google.com/sounds/v1/water/bubbles.ogg"></audio>
 
   <script>
     const LAVA_RPC = "https://g.w.lavanet.xyz:443/gateway/neart/rpc-http/a6e5f4c9ab534914cbf08b66860da55d";
-
     const scannerSound = document.getElementById("scanner");
     const bubblesSound = document.getElementById("bubbles");
     const liquid = document.getElementById("liquid");
 
-    // Chart setup
     const ctx = document.getElementById("balanceChart").getContext("2d");
     const balanceChart = new Chart(ctx, {
       type: "line",
-      data: {
-        labels: [],
-        datasets: [{
-          label: "Balance (NEAR)",
-          data: [],
-          borderColor: "#00e6ff",
-          backgroundColor: "rgba(0,230,255,0.2)",
-          tension: 0.3
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          x: { title: { display: true, text: "Experiment Run" } },
-          y: { title: { display: true, text: "Balance (NEAR)" } }
-        }
-      }
+      data: { labels: [], datasets: [{ label: "Balance (NEAR)", data: [], borderColor: "#00e6ff", backgroundColor: "rgba(0,230,255,0.2)", tension: 0.3 }] },
+      options: { responsive: true, scales: { x: { title: { display: true, text: "Experiment Run" } }, y: { title: { display: true, text: "Balance (NEAR)" } } } }
     });
 
     async function checkContract() {
       const contract = document.getElementById("contract").value.trim();
-      if (!contract) {
-        document.getElementById("result").textContent = "❌ Please enter a contract name.";
-        return;
-      }
-      scannerSound.play();
-      animateTube();
-      await fetchContract(contract, "result", "analytics");
+      if (!contract) { document.getElementById("result").textContent = "❌ Please enter a contract name."; return; }
+      scannerSound.play(); animateTube(); await fetchContract(contract, "result", "analytics");
     }
 
     async function runPreset(contract) {
       document.getElementById("experiments").textContent = `⏳ Testing ${contract}...`;
-      scannerSound.play();
-      animateTube();
-      await fetchContract(contract, "experiments", "analytics");
+      scannerSound.play(); animateTube(); await fetchContract(contract, "experiments", "analytics");
     }
 
     async function fetchContract(contract, targetDivId, analyticsDivId) {
       const targetDiv = document.getElementById(targetDivId);
       const analyticsDiv = document.getElementById(analyticsDivId);
       targetDiv.textContent = "⏳ Running experiment...";
-
       try {
         const response = await fetch(LAVA_RPC, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            jsonrpc: "2.0",
-            id: "dontcare",
-            method: "query",
-            params: {
-              request_type: "view_account",
-              finality: "final",
-              account_id: contract
-            }
-          })
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jsonrpc: "2.0", id: "dontcare", method: "query", params: { request_type: "view_account", finality: "final", account_id: contract } })
         });
-
         const data = await response.json();
         if (data.result) {
           const balance = (data.result.amount / 1e24).toFixed(4);
           const storage = data.result.storage_usage;
-          targetDiv.textContent =
-            `✅ ${contract} scanned!\nBalance: ${balance} NEAR\nStorage: ${storage} bytes\n🔬 Via Lava RPC`;
-
-          analyticsDiv.textContent =
-            `🥽 Analytics Report:\n- Contract: ${contract}\n- Balance: ${balance} NEAR\n- Storage: ${storage} bytes`;
-
-          // update chart
+          targetDiv.textContent = `✅ ${contract} scanned!\nBalance: ${balance} NEAR\nStorage: ${storage} bytes\n🔬 Via Lava RPC`;
+          analyticsDiv.textContent = `🥽 Analytics Report:\n- Contract: ${contract}\n- Balance: ${balance} NEAR\n- Storage: ${storage} bytes`;
           balanceChart.data.labels.push(contract);
           balanceChart.data.datasets[0].data.push(balance);
           balanceChart.update();
-
           bubblesSound.play();
-        } else {
-          targetDiv.textContent = "⚠️ Could not fetch contract info.";
-        }
-      } catch (err) {
-        targetDiv.textContent = "❌ Error connecting to Lava RPC.";
-      }
+        } else targetDiv.textContent = "⚠️ Could not fetch contract info.";
+      } catch (err) { targetDiv.textContent = "❌ Error connecting to Lava RPC."; }
     }
 
     async function callMethod() {
       const contract = document.getElementById("contract").value.trim();
       const method = document.getElementById("method").value.trim();
-      const argsInput = document.getElementById("args").value.trim();
-      const resultDiv = document.getElementById("methodResult");
-
-      if (!contract || !method) {
-        resultDiv.textContent = "⚠️ Enter contract + method.";
-        return;
-      }
-
       let args;
-      try {
-        args = argsInput ? JSON.parse(argsInput) : {};
-      } catch {
-        resultDiv.textContent = "⚠️ Invalid JSON in args.";
-        return;
-      }
+      try { args = document.getElementById("args").value.trim(); args = args ? JSON.parse(args) : {}; }
+      catch { document.getElementById("methodResult").textContent = "❌ Invalid JSON in arguments."; return; }
+      if (!contract || !method) { document.getElementById("methodResult").textContent = "❌ Enter contract and method."; return; }
 
       try {
-        const res = await fetch(LAVA_RPC, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            jsonrpc: "2.0",
-            id: "1",
-            method: "query",
-            params: {
-              request_type: "call_function",
-              finality: "final",
-              account_id: contract,
-              method_name: method,
-              args_base64: btoa(JSON.stringify(args))
-            }
-          })
+        const response = await fetch(LAVA_RPC, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jsonrpc: "2.0", id: "dontcare", method: "query", params: { request_type: "call_function", finality: "final", account_id: contract, method_name: method, args_base64: btoa(JSON.stringify(args)) } })
         });
-
-        const data = await res.json();
-        if (data.error) throw data.error;
-
-        const result = new TextDecoder().decode(new Uint8Array(data.result.result));
-        resultDiv.textContent = `📊 Result:\n${result}`;
-      } catch (e) {
-        resultDiv.textContent = "❌ Error: " + JSON.stringify(e, null, 2);
-      }
+        const data = await response.json();
+        if (data.result) {
+          const res = new TextDecoder().decode(new Uint8Array(data.result.result));
+          document.getElementById("methodResult").textContent = `✅ Result:\n${res}`;
+        } else document.getElementById("methodResult").textContent = "⚠️ No result.";
+      } catch (err) { document.getElementById("methodResult").textContent = "❌ Error connecting to Lava RPC."; }
     }
 
-    function animateTube() {
-      liquid.style.height = "0%";
-      liquid.style.animation = "fill 3s forwards";
-    }
+    function animateTube() { liquid.style.height = "0%"; liquid.style.animation = "fill 3s forwards"; }
   </script>
 </body>
 </html>
