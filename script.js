@@ -26,16 +26,22 @@ const balanceChart = new Chart(ctx, {
     }
 });
 
-async function checkContract() {
-    const contract = document.getElementById('contract').value.trim();
-    if (!contract) {
-        document.getElementById('result').textContent = '❌ Please enter a contract name.';
-        return;
-    }
-    scannerSound.play();
-    animateTube();
-    await fetchContract(contract, 'result', 'analytics');
-}
+const viewCheck = await fetch(LAVA_RPC, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 2,
+        method: 'query',
+        params: {
+            request_type: 'call_function',
+            finality: 'final',
+            account_id: contractAddress,
+            method_name: 'get_messages',
+            args_base64: btoa(JSON.stringify({}))
+        }
+    })
+});
 
 async function runPreset(contract) {
     document.getElementById('experiments').textContent = `⏳ Testing ${contract}...`;
