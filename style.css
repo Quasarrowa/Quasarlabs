@@ -148,3 +148,66 @@ footer {
   font-size: 0.9em;
   color: #888;
 }
+
+body {
+    background: linear-gradient(to bottom, #0a0a23, #1a1a4a);
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+h1, h2 {
+    color: #00d4ff;
+    text-shadow: 0 0 10px #00d4ff;
+}
+
+input {
+    padding: 10px;
+    width: 70%;
+    max-width: 300px;
+    margin: 10px;
+    border: 2px solid #00d4ff;
+    border-radius: 5px;
+    background: #1a1a4a;
+    color: #ffffff;
+}
+
+button {
+    padding: 10px 20px;
+    background: #00d4ff;
+    border: none;
+    border-radius: 5px;
+    color: #0a0a23;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #00aaff;
+}
+
+section {
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin: 10px 0;
+    padding: 10px;
+    background: rgba(0, 212, 255, 0.2);
+    border-radius: 5px;
+}
