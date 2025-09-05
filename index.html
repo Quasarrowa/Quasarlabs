@@ -1,111 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Quasar Labs 🧪🔬</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-  <header>
-    <h1>🔬 Quasar Labs 🧪</h1>
-    <p>Where dApps get tested like real experiments 🥼🥽</p>
-  </header>
-
-  <!-- Test Tube -->
-  <div class="test-tube">
-    <div class="liquid" id="liquid"></div>
-    <div class="bubbles">
-      <div class="bubble"></div>
-      <div class="bubble"></div>
-      <div class="bubble"></div>
-    </div>
-  </div>
-
-  <!-- Contract Checker -->
-  <div class="lab-container">
-    <h2>🔬 Contract Microscope</h2>
-    <label for="contract">Enter NEAR Testnet Contract Address:</label>
-    <input id="contract" type="text" placeholder="e.g., guest-book.testnet">
-    <button onclick="checkContract()">Run Test</button>
-    <div id="result">Waiting for input...</div>
-  </div>
-
-  <!-- Analytics -->
-  <div class="lab-container">
-    <h2>🥽 Analytics Goggles</h2>
-    <div id="analytics">No contract tested yet.</div>
-    <canvas id="balanceChart" width="400" height="200"></canvas>
-  </div>
-
-  <!-- Experiments -->
-  <div class="lab-container">
-    <h2>🧪 Lab Experiments</h2>
-    <p>Quick tests on sample dApps:</p>
-    <button onclick="runPreset('guest-book.testnet')">📖 Guest Book</button>
-    <button onclick="runPreset('wrap.testnet')">💎 wNEAR</button>
-    <button onclick="runPreset('staking_pool.testnet')">⛓️ Staking Pool</button>
-    <div id="experiments">Choose an experiment above.</div>
-  </div>
-
-  <footer>
-    🥼 Built at Quasar Labs | Powered by NEAR + Lava RPC
-  </footer>
-
-  <!-- Sound Effects -->
-  <audio id="scanner" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
-  <audio id="bubbles" src="https://actions.google.com/sounds/v1/water/bubbles.ogg"></audio>
-
-  <script src="script.js"></script>
-</body>
-</html>
-<div class="lab-frame"></div>
-
-<!-- Neon floating particles -->
-<script>
-  for (let i = 0; i < 30; i++) {
-    let p = document.createElement("div");
-    p.className = "particle";
-    p.style.top = Math.random() * window.innerHeight + "px";
-    p.style.left = Math.random() * window.innerWidth + "px";
-    p.style.animationDuration = (5 + Math.random() * 10) + "s";
-    document.body.appendChild(p);
-  }
-</script>
-<input id="accountInput" type="text" placeholder="Enter NEAR testnet account" />
-<button onclick="checkBalance()">Check Balance</button>
-<p id="result"></p>
-<!DOCTYPE html>
-<html lang="en">
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quasar Labs</title>
+    <title>Quasar Labs 🧪🔬</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
+    <header>
         <h1>🔬 Quasar Labs 🧪</h1>
         <p>Where dApps get tested like real experiments 🥼🥽</p>
+    </header>
 
-        <section>
-            <h2>🔬 Contract Microscope</h2>
-            <input type="text" id="contractAddress" placeholder="Enter NEAR testnet contract (e.g., guest-book.testnet)">
-            <button onclick="testContract()">Run Test</button>
-            <div id="testResult">Waiting for input...</div>
-        </section>
-
-        <section>
-            <h2>🥽 Analytics Goggles</h2>
-            <div id="analyticsResult">No contract tested yet.</div>
-        </section>
-
-        <section>
-            <h2>🧪 Lab Experiments</h2>
-            <p>Test results will appear here:</p>
-            <ul id="experimentResults"></ul>
-        </section>
+    <!-- Test Tube (Visual) -->
+    <div class="test-tube">
+        <div class="liquid" id="liquid"></div>
+        <div class="bubbles">
+            <div class="bubble"></div>
+            <div class="bubble"></div>
+            <div class="bubble"></div>
+        </div>
     </div>
+
+    <!-- Contract Scanner -->
+    <div class="lab-container">
+        <h2>🔬 Contract Scanner</h2>
+        <label for="contract">Enter NEAR Testnet Contract Address:</label>
+        <input id="contract" type="text" placeholder="e.g., guest-book.testnet">
+        <button onclick="checkContract()">Run Test</button>
+        <div id="result">Waiting for input...</div>
+    </div>
+
+    <!-- Contract Microscope (Detailed Test) -->
+    <div class="lab-container">
+        <h2>🔬 Contract Microscope</h2>
+        <input type="text" id="contractAddress" placeholder="Enter NEAR testnet contract (e.g., guest-book.testnet)">
+        <button onclick="testContract()">Run Test</button>
+        <div id="testResult">Waiting for input...</div>
+    </div>
+
+    <!-- Analytics Goggles -->
+    <div class="lab-container">
+        <h2>🥽 Analytics Goggles</h2>
+        <div id="analytics">No contract tested yet.</div>
+    </div>
+
+    <!-- Lab Experiments -->
+    <div class="lab-container">
+        <h2>🧪 Lab Experiments</h2>
+        <p>Quick tests on sample dApps:</p>
+        <button onclick="runPreset('guest-book.testnet')">📖 Guest Book</button>
+        <button onclick="runPreset('ref-finance-101.testnet')">💎 Ref Finance</button>
+        <div id="experiments">Choose an experiment above.</div>
+    </div>
+
+    <footer>
+        🥼 Built at Quasar Labs | Powered by NEAR + Lava RPC
+    </footer>
+
     <script src="script.js"></script>
 </body>
 </html>
