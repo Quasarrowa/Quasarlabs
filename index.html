@@ -75,3 +75,37 @@
 <input id="accountInput" type="text" placeholder="Enter NEAR testnet account" />
 <button onclick="checkBalance()">Check Balance</button>
 <p id="result"></p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quasar Labs</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 Quasar Labs 🧪</h1>
+        <p>Where dApps get tested like real experiments 🥼🥽</p>
+
+        <section>
+            <h2>🔬 Contract Microscope</h2>
+            <input type="text" id="contractAddress" placeholder="Enter NEAR testnet contract (e.g., guest-book.testnet)">
+            <button onclick="testContract()">Run Test</button>
+            <div id="testResult">Waiting for input...</div>
+        </section>
+
+        <section>
+            <h2>🥽 Analytics Goggles</h2>
+            <div id="analyticsResult">No contract tested yet.</div>
+        </section>
+
+        <section>
+            <h2>🧪 Lab Experiments</h2>
+            <p>Test results will appear here:</p>
+            <ul id="experimentResults"></ul>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
