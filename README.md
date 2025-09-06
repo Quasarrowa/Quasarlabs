@@ -1,6 +1,6 @@
 # Quasar Labs
 
-🔬 **Where dApps get tested  🧪**
+ **Where dApps get tested  **
 
 Quasar Labs is a mobile-built dApp testing platform for NEAR Protocol, powered by Lava Network’s RPC endpoints. It scans NEAR testnet contracts to verify deployment, test function calls, and detect issues, displaying results with:
 - ✅ Working functions and deployment.
